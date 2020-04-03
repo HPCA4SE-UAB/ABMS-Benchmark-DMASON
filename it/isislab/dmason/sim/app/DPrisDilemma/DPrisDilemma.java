@@ -238,7 +238,7 @@ public class DPrisDilemma extends DistributedState<Double2D>{
             i++;
         }    
         
-        System.out.println("Agentes cargados de fichero con éxito ! ___ "+field.size());
+        //System.out.println("Agentes cargados de fichero con éxito ! ___ "+field.size());
         long stopTime = System.currentTimeMillis();
         
     }
@@ -332,12 +332,11 @@ public class DPrisDilemma extends DistributedState<Double2D>{
         
         try {
             System.out.println("Writting... ");
-            writePositions(it,agents.size());
+            writePositionsPayoffs(it,agents.size());
             
             it = agents.iterator();
             //System.out.println("PAYOFF SIZE IT : "+ iterator.size(it));
             
-            printPayoffs(it, agents.size());
         }catch(IOException ioe){
             System.out.println("Error at end_sim_prints");
         }
@@ -357,68 +356,34 @@ public class DPrisDilemma extends DistributedState<Double2D>{
 	*
 	* returns: -
 	*/       
-    public void writePositions(Iterator<DPrisoner> it, int num_agents) throws   UnsupportedEncodingException,FileNotFoundException {
+    public void writePositionsPayoffs(Iterator<DPrisoner> it, int num_agents) throws   UnsupportedEncodingException,FileNotFoundException {
         String pos_file = "logs/results/"+TYPE+"_"+num_agents+"_positions.txt";
         PrintWriter writer = new PrintWriter(pos_file, "UTF-8");
 
+
         while(it.hasNext()){
+
             DPrisoner agentInField = it.next();
             Double2D pos = agentInField.getPos();
             //System.out.println(TYPE+" -- "+agentInField.getId());
             
             if (field.myfield.isMine(pos.x,pos.y) || 
-            field.rmap.EAST_MINE.isMine(pos.x,pos.y)  || 
-            field.rmap.WEST_MINE.isMine(pos.x,pos.y) ||
-            field.rmap.SOUTH_MINE.isMine(pos.x,pos.y) ||
-            field.rmap.NORTH_MINE.isMine(pos.x,pos.y)){
-                writer.println(pos.x+" "+pos.y);
-                writer.println(agentInField.getId()+" "+agentInField.getPos());
+            	field.rmap.EAST_MINE.isMine(pos.x,pos.y)  || 
+            	field.rmap.WEST_MINE.isMine(pos.x,pos.y) ||
+            	field.rmap.SOUTH_MINE.isMine(pos.x,pos.y) ||
+            	field.rmap.NORTH_MINE.isMine(pos.x,pos.y)){
 
+                //writer.println(pos.x+" "+pos.y);
+                writer.println(agentInField.getId()+" "+agentInField.getPos()+" C "+agentInField.c+" TOTAL "+ agentInField.total);
             }
 
         }      
+
 
         writer.close();
         
     }
     
- 	/*
-	* Function: printPayoffs
-	* --------------------
-	* 
-	* 
-	* it: 
-	* num_agents:
-	* 
-	*
-	* returns: -
-	*/      
-    public void printPayoffs(Iterator<DPrisoner> it, int num_agents)  {
-        //hacer medias payoffs
-        //System.out.println("PAYOFFS : ");
-        double cPayoffMean = 0, totalPayoffMean = 0;
-        long compTime = 0, playTime = 0;
-        
-        while(it.hasNext()){
-            DPrisoner agentInField = it.next();
-            
-            cPayoffMean += agentInField.c;
-            totalPayoffMean += agentInField.total;
-            
-            compTime += agentInField.timeCompute;    
-            playTime += agentInField.timePlay;    
-            //System.out.println("IN PROGRESS -- c : "+agentInField.getC()+" -- total : "+agentInField.getTotal());
-        }
-        
-        cPayoffMean = cPayoffMean/num_agents;        
-        totalPayoffMean = totalPayoffMean/num_agents;
-        
-        compTime = compTime; 
-        playTime = playTime; 
-        
-        System.out.println("["+field.own_x+" , "+field.own_y+"] totalPayoff mean : "+totalPayoffMean+" -- cPayoff mean : "+cPayoffMean);
-        System.out.println("["+field.own_x+" , "+field.own_y+"] Compute time : "+compTime+" -- Play time : "+playTime);
-    }
 
  	/*
 	* Function: DPrisoner
