@@ -36,6 +36,7 @@ import it.isislab.dmason.sim.field.continuous.DContinuousGrid2DFactory;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
@@ -78,6 +79,9 @@ public class DPrisDilemma extends DistributedState<Double2D>{
     
     public long startTime;
 
+	public Random rnd;
+	public final long seed = 1234;
+
 
 	/*
 	* Function: DPrisDilemma
@@ -95,6 +99,8 @@ public class DPrisDilemma extends DistributedState<Double2D>{
 		this.MODE=params.getMode();
 		this.gridWidth=params.getWidth();
 		this.gridHeight=params.getHeight();
+
+		this.rnd = new Random(seed);
       
 	}
 
@@ -116,6 +122,8 @@ public class DPrisDilemma extends DistributedState<Double2D>{
 		gridWidth=params.getWidth();
 		gridHeight=params.getHeight();
 		topicPrefix = prefix; 
+
+		this.rnd = new Random(seed);
         
 		for (EntryParam<String, Object> entryParam : simParams) {
 
@@ -214,7 +222,7 @@ public class DPrisDilemma extends DistributedState<Double2D>{
         Double2D[] agent_position = loadAgentPositions();
         int i = 0; 
        
-        DPrisoner prisoner = new DPrisoner(this); 
+        DPrisoner prisoner = new DPrisoner(this, rnd); 
 
         //while(field.size() != agentsToCreate  && i < agent_position.length-1/**/){
         while(i < agent_position.length){
@@ -225,14 +233,14 @@ public class DPrisDilemma extends DistributedState<Double2D>{
             field.rmap.SOUTH_MINE.isMine(agent_position[i].x,agent_position[i].y) ||
             field.rmap.NORTH_MINE.isMine(agent_position[i].x,agent_position[i].y)){
                 
-                //System.out.println("AGENT "+ agent_position[i] +" belongs to this region " + "(" + prisoner.getId() + ")");
+                //System.out.println("AGENT "+ agent_position[i] +" belongs to region " +TYPE+ " (" + prisoner.getId() + ")");
                 prisoner.setPos(agent_position[i]);
 
                 field.setObjectLocation(prisoner,prisoner.pos);
                 schedule.scheduleOnce(prisoner);
 
                 if(field.size() != super.NUMAGENTS)
-                    prisoner = new DPrisoner(this);
+                    prisoner = new DPrisoner(this, rnd);
                                      
             }
             i++;

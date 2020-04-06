@@ -38,6 +38,8 @@ import sim.engine.SimState;
 import sim.util.*;
 import sim.engine.*; 
 
+import java.util.Random;
+
 /*
  *    Class: DPrisoner  
  * --------------------
@@ -58,6 +60,8 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
     
     public double c, total;
     public long timeCompute, timePlay;
+
+	public Random rnd;
 
 	public double[] fft_input;    
 
@@ -82,7 +86,7 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 	* 
 	* returns: -
 	*/   
-    public DPrisoner(DistributedState<Double2D> st){
+    public DPrisoner(DistributedState<Double2D> st, Random _rnd){
         super(st);    
  
 		final DPrisDilemma mod = (DPrisDilemma) st;
@@ -97,7 +101,10 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
         this.c = 100;
         this.total = 200;
         this.timePlay = 0;
-        this.timeCompute = 0;        
+        this.timeCompute = 0;
+	
+	this.rnd = _rnd;
+        
     }
 
 	/*
@@ -116,16 +123,16 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
         Double2D current_position = mod.field.getObjectLocation(this);
         Double2D newloc = move(mod, current_position);
 
-if (this.getId().equals("0-1-1130")){System.out.println("(2)--- "+mod.TYPE+" "+this.getId()+" "+this.getPos());}
-if (this.getId().equals("0-1-1130")){System.out.println("(2)  - "+(int)comm_buffer[0]);}
+//if (this.getId().equals("0-1-1130")){System.out.println("(2)--- "+mod.TYPE+" "+this.getId()+" "+this.getPos());}
+//if (this.getId().equals("0-1-1130")){System.out.println("(2)  - "+(int)comm_buffer[0]);}
 
-if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");} 
+//if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");} 
 
         play(mod, newloc);
         compute();
       
         if(reproduction(newloc, mod)){
-            DPrisoner ag = new DPrisoner(mod);           
+            DPrisoner ag = new DPrisoner(mod, rnd);           
             try {
                 ag.setPos(newloc);
                 mod.field.setDistributedObjectLocation(ag.pos,ag,state);
@@ -146,7 +153,7 @@ if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");}
                 e.printStackTrace();
             }	
         }else{
-			System.out.println("Defunció "+mod.TYPE+" "+this.getId()+" "+this.getPos()); 	
+		//	System.out.println("Defunció "+mod.TYPE+" "+this.getId()+" "+this.getPos()); 	
             mod.killAgent(this); 
         }
     }
@@ -162,8 +169,10 @@ if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");}
 	* returns: -
 	*/       
     public Double2D move(DPrisDilemma mod, Double2D current_pos ){
-        double dx = mod.random.nextDouble() < 0.5 ? -1 : 1;
-        double dy = mod.random.nextDouble() < 0.5 ? -1 : 1;
+        //double dx = mod.random.nextDouble() < 0.5 ? -1 : 1;
+        //double dy = mod.random.nextDouble() < 0.5 ? -1 : 1;
+        double dx = rnd.nextDouble() < 0.5 ? -1 : 1;
+        double dy = rnd.nextDouble() < 0.5 ? -1 : 1;
 
         return new Double2D(mod.field.stx(current_pos.x + dx), mod.field.sty(current_pos.y + dy));
     }
@@ -179,7 +188,8 @@ if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");}
 	*/         
     public boolean cooperate(DPrisDilemma mod){
 
-         return mod.random.nextDouble() < c/total;     
+         //return mod.random.nextDouble() < c/total;     
+         return rnd.nextDouble() < c/total;     
     }
 
 	/*
@@ -195,6 +205,7 @@ if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");}
     public void play(DPrisDilemma st, Double2D pos){
         Bag neighbours = new Bag();
         int i = 0;
+	double separation_distance = 0;
         
         neighbours = st.field.getNeighborsWithinDistance(pos, st.INTERACTION_RAD, true);
         Iterator<DPrisoner> it = neighbours.iterator();
@@ -204,21 +215,36 @@ if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");}
         while(it.hasNext()){
             DPrisoner agentToPlay = it.next();
             if (agentToPlay.getId() == this.getId())   continue;
+
+		//Note: getNeighborsWithinDistance method for efficiency 
+		//      includes also extra agents which are not necessary in the specific range
+
+		separation_distance = euclideanDistance(pos, agentToPlay.getPos());
+
+
+		if (separation_distance < st.INTERACTION_RAD){
             
-            boolean iCooperated = this.cooperate(st); 
-            double payoff = (iCooperated ? ( agentToPlay.cooperate(st) ? 7 : 1 ) : ( agentToPlay.cooperate(st) ? 10 : 3));
+            		boolean iCooperated = this.cooperate(st); 
+            		double payoff = (iCooperated ? ( agentToPlay.cooperate(st) ? 7 : 1 ) : ( agentToPlay.cooperate(st) ? 10 : 3));
             
-            if (iCooperated) cPayoff += payoff; 
-            totalPayoff += payoff; 
+            		if (iCooperated) cPayoff += payoff; 
+            		totalPayoff += payoff; 
 
 			//System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+this.getPos()+" "+agentToPlay.getPos());   
+
+			//if (this.getId().equals("0-0-26")){System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+ pos +" "+agentToPlay.getPos() + " distance " + separation_distance);}
             
-            i++; 
-            if (i >= MAX_AGENTS_TO_PLAY) break;     // Controls max number of agents to play with
+			//if (this.getId().equals("0-0-26")){System.out.println("Step 0-0-26 " + st.TYPE + " i " + i + " iCooperated " +  iCooperated +  " payoff "+  payoff +" cPayoff " +  cPayoff + " totalPayoff "  + totalPayoff + " neighbours.size() " + neighbours.size());} 
+
+            		i++; 
+            		if (i >= MAX_AGENTS_TO_PLAY) break;     // Controls max number of agents to play with
+		}
+
         }
  
         this.c += cPayoff;
         this.total += totalPayoff;
+	//if (this.getId().equals("0-0-26")){System.out.println("-Step 0-0-26 "+ st.TYPE + " i " + i + " c " +  c + " total "  + total);} 
     }
 
 	/*
@@ -261,7 +287,8 @@ if (this.getId().equals("0-0-23")){
      public Boolean reproduction(Double2D pos, DPrisDilemma mod){
         double birth_rate_factor = BIRTH_RATE*(1 - Math.min(1 , Math.sqrt( Math.pow(Math.abs(pos.x-CENTER_BIRTH.x),2) + Math.pow(Math.abs(pos.y-CENTER_BIRTH.y),2) )/((mod.gridHeight+mod.gridWidth)/2)) );
         
-        return ( mod.random.nextDouble() < birth_rate_factor ? true : false);
+        //return ( mod.random.nextDouble() < birth_rate_factor ? true : false);
+        return ( rnd.nextDouble() < birth_rate_factor ? true : false);
     }
 
 	/*
@@ -277,9 +304,28 @@ if (this.getId().equals("0-0-23")){
     public Boolean die (Double2D pos, DPrisDilemma mod){
         double death_rate_factor = DEATH_RATE * (1 - Math.min(1 , Math.sqrt( Math.pow(Math.abs(pos.x-CENTER_DEATH.x),2) + Math.pow(Math.abs(pos.y-CENTER_DEATH.y),2) )/((mod.gridHeight+mod.gridWidth)/2)) );
         
-        Boolean miau = mod.random.nextDouble() < death_rate_factor ? true : false;
+        //Boolean miau = mod.random.nextDouble() < death_rate_factor ? true : false;
+        Boolean miau = rnd.nextDouble() < death_rate_factor ? true : false;
         return miau;
     }
+
+        /*
+ 	*Function: euclideanDistance
+ 	* --------------------
+ 	* 
+ 	* 
+ 	* me_location:
+ 	* other_location:
+ 	* 
+ 	* returns: -
+ 	*/
+        public static double euclideanDistance(Double2D me_location, Double2D other_location){
+
+                return Math.sqrt(Math.pow((me_location.x - other_location.x),2) + Math.pow((me_location.y - other_location.y),2));
+        }
+
+
+
         
     
 }
