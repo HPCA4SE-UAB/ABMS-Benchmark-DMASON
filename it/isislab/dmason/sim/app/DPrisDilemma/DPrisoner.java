@@ -224,8 +224,9 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 
 		if (separation_distance < st.INTERACTION_RAD){
             
-            		boolean iCooperated = this.cooperate(st); 
-            		double payoff = (iCooperated ? ( agentToPlay.cooperate(st) ? 7 : 1 ) : ( agentToPlay.cooperate(st) ? 10 : 3));
+            		boolean iCooperated = this.cooperate(st);
+			boolean otherCooperated = agentToPlay.cooperate(st); 
+            		double payoff = (iCooperated ? ( otherCooperated ? 7 : 1 ) : ( otherCooperated ? 10 : 3));
             
             		if (iCooperated) cPayoff += payoff; 
             		totalPayoff += payoff; 
