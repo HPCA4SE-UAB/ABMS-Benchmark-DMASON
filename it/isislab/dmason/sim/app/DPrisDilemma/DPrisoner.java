@@ -222,7 +222,7 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 		separation_distance = euclideanDistance(pos, agentToPlay.getPos());
 
 
-		if (separation_distance < st.INTERACTION_RAD){
+		if (separation_distance <= st.INTERACTION_RAD){
             
             		boolean iCooperated = this.cooperate(st);
 			boolean otherCooperated = agentToPlay.cooperate(st); 
