@@ -73,9 +73,10 @@ public class DPrisDilemma extends DistributedState<Double2D>{
     
     public String FFT_FILE = "fft.data";
     public double[] fft_input;
+    public double[] fft_input_dprisoner = null;
     
-    public String AGENTS_FILE = "0_1000.data";
-    public int num_agents = 1000;
+    public String AGENTS_FILE = "0_8000.data";
+    public int num_agents = 8000;
     
     public long startTime;
 

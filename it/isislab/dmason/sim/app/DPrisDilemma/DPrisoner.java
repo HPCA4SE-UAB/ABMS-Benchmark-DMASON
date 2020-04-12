@@ -89,10 +89,16 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
     public DPrisoner(DistributedState<Double2D> st, Random _rnd){
         super(st);    
  
-		final DPrisDilemma mod = (DPrisDilemma) st;
+	final DPrisDilemma mod = (DPrisDilemma) st;
+	
+	if (mod.fft_input_dprisoner == null){
 		fft_input = new double[mod.fft_input.length]; // Fem còpia perquè sinó el Garbage collector l'esborra de DPrisDilemma quan acaba DPrisDilemma.start()?
 		// Tindria sentit perquè en aquest constructor es podria accedir perfectament a la info de mod.fft_input, però no a step() o compute()
 		System.arraycopy(mod.fft_input, 0, fft_input, 0, mod.fft_input.length);
+		mod.fft_input_dprisoner = fft_input;
+	}else{
+		fft_input = mod.fft_input_dprisoner;
+	}
     
         for (int i=0; i<COMM_BUFF_SIZE; i++){
             comm_buffer[i] = (char)i;
