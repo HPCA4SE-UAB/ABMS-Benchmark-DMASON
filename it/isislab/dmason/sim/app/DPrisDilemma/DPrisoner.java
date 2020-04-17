@@ -263,22 +263,26 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 	* returns: -
 	*/            
      public void compute(){		 
-        double [] fft_in = new double[fft_input.length]; 
-		System.arraycopy(fft_input, 0, fft_in, 0, fft_input.length); //Es duplica perquè DoubleFFT_1D la utilitza com a retorn
+        double [] fft_in = new double[fft_input.length];
+	double fft_out_sum = 0; 
+	System.arraycopy(fft_input, 0, fft_in, 0, fft_input.length); //Es duplica perquè DoubleFFT_1D la utilitza com a retorn
 
-		DoubleFFT_1D fft = new DoubleFFT_1D(fft_in.length/2);
-		fft.complexForward(fft_in);  		
-		
-/*if (this.getId().equals("0-0-23")){System.out.println("mod.fft_input (DPrisioner.compute): "+fft_input);}
+	DoubleFFT_1D fft = new DoubleFFT_1D(fft_in.length/2);
+	fft.complexForward(fft_in);  		
+
+	for(int i=0;i<fft_in.length  ;i++) {
+		fft_out_sum += fft_in[i];	            
+        }
+
+/*if (this.getId().equals("0-0-23")){System.out.println("fft_out_sum  "+fft_out_sum);}
+
 if (this.getId().equals("0-0-23")){
 	System.out.println("(DPrisioner.compute) {");
 	for(int i=0;i<10;i++) {
             System.out.print(fft_in[i]+" ");
 	}
 	System.out.println(" ");
-}
-*/
-
+}*/
     }
    
 	/*
