@@ -383,7 +383,7 @@ public class DPrisDilemma extends DistributedState<Double2D>{
             	field.rmap.NORTH_MINE.isMine(pos.x,pos.y)){
 
                 //writer.println(pos.x+" "+pos.y);
-                writer.println(agentInField.getId()+" "+agentInField.getPos()+" C "+agentInField.c+" TOTAL "+ agentInField.total);
+                writer.println(agentInField.getId()+" "+agentInField.getPos()+" C "+agentInField.c+" TOTAL "+ agentInField.total + " TotalComputeTime " + agentInField.timeCompute);
             }
 
         }      

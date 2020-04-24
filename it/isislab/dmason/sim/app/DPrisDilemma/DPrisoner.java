@@ -123,7 +123,7 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 	* returns: -
 	*/       
      public void step(SimState state){
-
+	long timeCompute_tmp = 0;
         final DPrisDilemma mod = (DPrisDilemma) state; 
 
         Double2D current_position = mod.field.getObjectLocation(this);
@@ -135,7 +135,12 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 //if (this.getId().equals("0-0-37")){System.out.println("Step 0-0-37");} 
 
         play(mod, newloc);
+
+	//timeCompute_tmp = System.currentTimeMillis();
+	timeCompute_tmp = System.nanoTime();
         compute();
+	//timeCompute += System.currentTimeMillis() - timeCompute_tmp;
+	timeCompute += System.nanoTime() - timeCompute_tmp;
       
         if(reproduction(newloc, mod)){
             DPrisoner ag = new DPrisoner(mod, rnd);           
