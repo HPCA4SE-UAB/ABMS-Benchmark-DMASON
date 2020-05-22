@@ -39,6 +39,7 @@ import sim.util.*;
 import sim.engine.*; 
 
 import java.util.Random;
+import java.util.HashSet;
 
 /*
  *    Class: DPrisoner  
@@ -110,7 +111,6 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
         this.timeCompute = 0;
 	
 	this.rnd = _rnd;
-        
     }
 
 	/*
@@ -128,6 +128,11 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 
         Double2D current_position = mod.field.getObjectLocation(this);
         Double2D newloc = move(mod, current_position);
+
+//Detectar agents que han canviat de slot
+if (this.getId().equals("0-0-69")){System.out.println("(1) "+mod.TYPE+" "+this.getId()+" "+this.getPos()+" "+(int)comm_buffer[0]+" "+(int)comm_buffer[1]+" c "+this.c );}
+
+
 
 //if (this.getId().equals("0-1-1130")){System.out.println("(2)--- "+mod.TYPE+" "+this.getId()+" "+this.getPos());}
 //if (this.getId().equals("0-1-1130")){System.out.println("(2)  - "+(int)comm_buffer[0]);}
@@ -215,23 +220,35 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 	*/         
     public void play(DPrisDilemma st, Double2D pos){
         Bag neighbours = new Bag();
+
         int i = 0;
 	double separation_distance = 0;
         
-        neighbours = st.field.getNeighborsWithinDistance(pos, st.INTERACTION_RAD, true);
+        //neighbours = st.field.getNeighborsWithinDistance(pos, st.INTERACTION_RAD, true);
+        neighbours = st.field.getNeighborsWithinDistance(pos, st.INTERACTION_RAD, true, false); //boolean nonPointObjects = false
+	//neighbours = st.field.getNeighborsExactlyWithinDistance(pos, st.INTERACTION_RAD, true);
+	
+	//To filter repeated agents at neighbours
+	HashSet<String> setAlreadyPlayed = new HashSet<String>();
+
         Iterator<DPrisoner> it = neighbours.iterator();
         
         double cPayoff = 0;
         double totalPayoff = 0;
         while(it.hasNext()){
-            DPrisoner agentToPlay = it.next();
-            if (agentToPlay.getId() == this.getId())   continue;
+            	DPrisoner agentToPlay = it.next();
+            	
+		if (agentToPlay.getId() == this.getId())   continue;
 
+	    	if (setAlreadyPlayed.contains(agentToPlay.getId())) continue; //To filter repeated agents
+		setAlreadyPlayed.add(agentToPlay.getId());
+   
 		//Note: getNeighborsWithinDistance method for efficiency 
 		//      includes also extra agents which are not necessary in the specific range
 
 		separation_distance = euclideanDistance(pos, agentToPlay.getPos());
 
+		//if (this.getId().equals("0-0-69")){System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+ pos +" "+agentToPlay.getPos() + " distance " + separation_distance + " neighbours.size() " + neighbours.size() + " i " + i);}
 
 		if (separation_distance <= st.INTERACTION_RAD){
             
@@ -244,9 +261,9 @@ public class DPrisoner extends DRemotePrisoner<Double2D> {
 
 			//System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+this.getPos()+" "+agentToPlay.getPos());   
 
-			//if (this.getId().equals("0-0-26")){System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+ pos +" "+agentToPlay.getPos() + " distance " + separation_distance);}
+			//if (this.getId().equals("0-0-69")){System.out.println("Agent "+this.getId()+" juga amb "+agentToPlay.getId()+" "+ pos +" "+agentToPlay.getPos() + " distance " + separation_distance);}
             
-			//if (this.getId().equals("0-0-26")){System.out.println("Step 0-0-26 " + st.TYPE + " i " + i + " iCooperated " +  iCooperated +  " payoff "+  payoff +" cPayoff " +  cPayoff + " totalPayoff "  + totalPayoff + " neighbours.size() " + neighbours.size());} 
+			//if (this.getId().equals("0-0-69")){System.out.println("Step 0-0-69 " + st.TYPE + " i " + i + " iCooperated " +  iCooperated +  " payoff "+  payoff +" cPayoff " +  cPayoff + " totalPayoff "  + totalPayoff + " neighbours.size() " + neighbours.size());} 
 
             		i++; 
             		if (i >= MAX_AGENTS_TO_PLAY) break;     // Controls max number of agents to play with
