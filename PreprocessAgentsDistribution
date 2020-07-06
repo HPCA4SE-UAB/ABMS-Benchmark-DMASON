@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 file" >&2
+  exit 1
+fi
+
+# create file with agents coordinates
+# execute with "logs/results/*.txt"
+cat $1 | grep Double2D | sort | uniq | awk -F "[" '{print $2}' | awk -F "]" '{print $1}' | awk -F "," '{print $1 " " $2}' > position_agents_norep_clean.data 
+
+
