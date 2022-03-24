@@ -15,7 +15,7 @@ This file is part of the ABMS-Benchmark-DMASON distribution (https://github.com/
 
 (1) INTRODUCTION
 
-In the benchmark we used the DMASON source code, version 3.2, provided at Github site:
+In the benchmark we used the DMASON source code, version 3.2, provided at GitHub site:
       https://github.com/isislab-unisa/dmason
       
 Some modifications in the DMASON source (3.2 version) for executing in HPC environments were made:
