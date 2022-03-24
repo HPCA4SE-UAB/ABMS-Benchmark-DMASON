@@ -16,4 +16,6 @@ In the benchmark we used the DMASON source code, version 3.2, provided at Github
       
 Some modifications for executing in HPC environments were made:
 
-1)
+1) DMASON 3.2, detects only first eth ethernet device avalaible (at one node IP address), as physical interface for ActiveMQ communications. In HPC environment, usually have multiple communications interfaces, in special some low latency networks like Infiniband ones. We modified the network interface detection, to take infiniband ones as main communication interface.
+
+2) 
