@@ -1,0 +1,19 @@
+Name: Notes of changes on	ABMS-Benchmark-DMASON execution on HPC environments with DMASON version 3.2
+Authors:-    
+		Josep Jorba Esteve (jjorbae at uoc.edu, josep.jorba at uab.cat)
+
+Copyright (c) 2020 Universitat Autònoma de Barcelona, Escola Universitària Salesiana de Sarrià, Universitat Oberta de Catalunya
+Date:-         	March 22, 2022
+
+This file is part of the ABMS-Benchmark-DMASON distribution (https://github.com/HPCA4SE-UAB/ABMS-Benchmark-DMASON.git).
+
+
+
+(1) INTRODUCTION
+
+In the benchmark we used the DMASON source code, version 3.2, provided at Github site:
+      https://github.com/isislab-unisa/dmason
+      
+Some modifications for executing in HPC environments were made:
+
+1)
