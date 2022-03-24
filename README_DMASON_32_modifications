@@ -1,5 +1,9 @@
 Name: Notes of changes on	ABMS-Benchmark-DMASON execution on HPC environments with DMASON version 3.2
 Authors:-    
+		Cristina Peralta Quesada (criiispq@gmail.com)
+		Andreu Moreno Vendrell (amoreno@euss.cat, andreu.moreno@uab.cat)
+		Anna Sikora (anna.sikora@uab.cat)
+ 		Eduardo César (eduardo.cesar@uab.cat)
 		Josep Jorba Esteve (jjorbae at uoc.edu, josep.jorba at uab.cat)
 
 Copyright (c) 2020 Universitat Autònoma de Barcelona, Escola Universitària Salesiana de Sarrià, Universitat Oberta de Catalunya
@@ -14,8 +18,28 @@ This file is part of the ABMS-Benchmark-DMASON distribution (https://github.com/
 In the benchmark we used the DMASON source code, version 3.2, provided at Github site:
       https://github.com/isislab-unisa/dmason
       
-Some modifications for executing in HPC environments were made:
+Some modifications in the DMASON source (3.2 version) for executing in HPC environments were made:
 
-1) DMASON 3.2, detects only first eth ethernet device avalaible (at one node IP address), as physical interface for ActiveMQ communications. In HPC environment, usually have multiple communications interfaces, in special some low latency networks like Infiniband ones. We modified the network interface detection, to take infiniband ones as main communication interface.
+1) In src/main/java/it/isislab/dmason/experimentals/systemmanagement/worker/Worker.java 
 
-2) 
+In the class CellExecutor run() method, change at the end of the method adding:
+
+if ( i == params.getMaxStep() ) {
+	dis.finish () ;
+}
+
+2) DMASON 3.2, detects only first eth ethernet device avalaible (at one node IP address), as physical interface for ActiveMQ communications. In HPC environment, usually have multiple communications interfaces, in special some low latency networks like Infiniband ones. We modified the network interface detection, to take infiniband ones as main communication interface.
+
+In the file src/main/java/it/isislab/dmason/experimentals/systemmanagement/worker/Worker.java
+
+Changes in function getIP() (detects only first interface, and also errors in first interface has
+Line : 	if (p.contains(".") && p.compareTo(c) != 0) 
+		return p;
+Changed to:
+	if (p.contains(".") && p.contains("XXX.") && p.compareTo(c) != 0)
+		return p;
+Where XXX = first IP octet of infiniband interface (ib0 ipv4 e.g.), to force to detect the supercomputer infiniband ipv4 interface (or other low latency network available at the worker nodes).
+
+		
+
+	
